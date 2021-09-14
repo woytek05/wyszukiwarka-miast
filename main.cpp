@@ -10,41 +10,44 @@ int main()
 {
   setlocale(LC_ALL, "");
 
-  string line, input;
+  string line;
   double x;
-  vector<string> cities;
+
+  vector<string> city;
+  vector<pair<double, double>> coordinates;
+  map<string, pair<double, double>> map;
+  map<string, double> map2;
+
   fstream file;
   file.open("miasta-pl.txt", ios::in);
 
   if (!file.good())
-    cout << "Nie można otworzyć pliku!";
+  {
+    cout << "Cannot open file!";
+    exit(0);
+  }
 
   while (!file.eof())
   {
     getline(file, line);
-    int begin = line.find("PL") + 4;
-    //string city = line.substr(begin, end);
-    //cities.push_back(city);
+    int start_index = line.find("PL") + 4;
+    int end_index;
+    string city_name = line.substr(start_index, end_index);
+    city.push_back(city_name);
+
+    start_index = end_index;
+    start_index += 3;
+    double lat = stod(line.substr(start_index, end_index));
+
+    start_index = end_index;
+    start_index += 3;
+    double lng = stod(line.substr(start_index, end_index));
+
+    pair<double, double> set(lat, lng);
+    coordinates.push_back(set);
   }
 
   file.close();
-
-  /*for (int i = 0; i < cities.size(); i++)
-  {
-    cout << cities[i] << endl;
-  }*/
-
-  /*cout << "Enter city name: ";
-  cin >> input;
-
-  if () //Jeżeli ten input znajduje się w wektorze cities, podaj x.
-  {
-    cout << "Enter the number of kilometers within which to find other cities: ";
-    cin >> x;
-  }
-  else //Jeżeli nie ma takiego miasta w wektorze, wypisz userowi wszystkie wyniki do ostatniej poprawnej literki.
-  {
-  }*/
 
   return 0;
 }
