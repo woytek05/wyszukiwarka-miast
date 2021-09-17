@@ -1,22 +1,28 @@
-#include <iostream>
+/*#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
+#include <cmath>*/
+#include <bits/stdc++.h>
 
 using namespace std;
 
+float calculate_distance(pair<float, float> first_city, pair<float, float> second_city);
+float find_cities_within_x_km(float x)
+{
+}
+
 int main()
 {
-  setlocale(LC_ALL, "");
+  string line, input;
+  int line_number = 0;
+  float x;
 
-  string line;
-  double x;
-
-  vector<string> city;
-  vector<pair<double, double>> coordinates;
-  map<string, pair<double, double>> map;
-  map<string, double> map2;
+  vector<string> city_names;
+  map<string, pair<float, float>> cities_and_coordinates;
+  map<string, float> cities_and_distances;
 
   fstream file;
   file.open("miasta-pl.txt", ios::in);
@@ -29,25 +35,74 @@ int main()
 
   while (!file.eof())
   {
-    getline(file, line);
-    int start_index = line.find("PL") + 4;
-    int end_index;
-    string city_name = line.substr(start_index, end_index);
-    city.push_back(city_name);
+    if (line_number != 0)
+    {
+      getline(file, line);
+      string city_name = "", lat = "", lng = "";
+      int i = line.find('L') + 3;
 
-    start_index = end_index;
-    start_index += 3;
-    double lat = stod(line.substr(start_index, end_index));
+      while (line[i] != ' ' || line[i + 1] != ' ')
+      {
+        city_name += line[i];
+        i++;
+      }
+      city_names.push_back(city_name);
 
-    start_index = end_index;
-    start_index += 3;
-    double lng = stod(line.substr(start_index, end_index));
+      i += 2;
+      while (line[i] != ' ' || line[i + 1] != ' ')
+      {
+        lat += line[i];
+        i++;
+      }
 
-    pair<double, double> set(lat, lng);
-    coordinates.push_back(set);
+      i += 2;
+      while (i < line.length())
+      {
+        lng += line[i];
+        i++;
+      }
+
+      pair<float, float> dataset(atof(lat.c_str()), atof(lng.c_str()));
+
+      cities_and_coordinates[city_name] = dataset;
+    }
+    line_number++;
   }
 
   file.close();
 
+  sort(city_names.begin(), city_names.end());
+
+  cout << "Podaj miasto: ";
+  cin >> input;
+
+  if (cities_and_coordinates.find(input) == cities_and_coordinates.end())
+  {
+    //tu ma być algorytm na znalezienie najdłuższego wspólnego prefixu
+    cout << "City isn't exist!" << endl;
+    exit(0);
+  }
+  else
+  {
+    cout << "Podaj promien: ";
+    cin >> x;
+
+    for (int i = 0; i < city_names.size(); i++)
+    {
+      cities_and_distances[city_names[i]] = calculate_distance(cities_and_coordinates[input], cities_and_coordinates[city_names[i]]);
+    }
+    //sort(cities_and_distances.begin(), cities_and_distances.end());
+    for (int i = 0; i < city_names.size(); i++)
+    {
+      if (cities_and_distances[city_names[i]] <= x)
+        cout << city_names[i] << " " << cities_and_distances[city_names[i]] << " " << endl;
+    }
+  }
+
   return 0;
+}
+
+float calculate_distance(pair<float, float> first_city, pair<float, float> second_city)
+{
+  return sqrt(pow(first_city.first - second_city.first, 2) + pow(first_city.second - second_city.second, 2)) * 73;
 }
